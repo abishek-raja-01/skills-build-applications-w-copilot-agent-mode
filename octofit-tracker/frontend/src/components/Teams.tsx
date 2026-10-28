@@ -1,4 +1,10 @@
+import { getJson } from '../api/client.js';
 import { CapabilityCard } from './CapabilityCard.js';
+
+function loadTeams() {
+  return getJson<Record<string, unknown>>('/api/teams');
+}
+
 export default function Teams() {
-  return <CapabilityCard title="Teams" description="Manage teams and members." endpoint="/api/teams" dataKey="teams" emptyMessage="No teams yet." fields={['name', 'mascot']} />;
+  return <CapabilityCard title="Teams" description="Manage teams and members." load={loadTeams} dataKey="teams" emptyMessage="No teams yet." fields={['name', 'mascot']} />;
 }

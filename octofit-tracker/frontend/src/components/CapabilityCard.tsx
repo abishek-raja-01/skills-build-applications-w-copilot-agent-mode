@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { getJson } from '../api/client.js';
 
 type Props = {
   title: string;
   description: string;
-  endpoint: string;
+  load: () => Promise<Record<string, unknown>>;
   dataKey: string;
   emptyMessage: string;
   fields: string[];
@@ -14,7 +13,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function CapabilityCard({ title, description, endpoint, dataKey, emptyMessage, fields }: Props) {
+export function CapabilityCard({ title, description, load, dataKey, emptyMessage, fields }: Props) {
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +23,7 @@ export function CapabilityCard({ title, description, endpoint, dataKey, emptyMes
     setLoading(true);
     setError(null);
 
-    getJson<Record<string, unknown>>(endpoint)
+    load()
       .then((response) => {
         const data = response[dataKey];
         if (!Array.isArray(data) || !data.every(isRecord)) {
@@ -42,7 +41,7 @@ export function CapabilityCard({ title, description, endpoint, dataKey, emptyMes
     return () => {
       cancelled = true;
     };
-  }, [dataKey, endpoint, title]);
+  }, [dataKey, load, title]);
 
   return (
     <section className="card h-100">
